@@ -10,7 +10,7 @@ async def initialize_db(db_name):
         await db.execute("INSERT INTO users (name, age) VALUES ('Charlie', 50)")
         await db.commit()
 
-# Function to fetch all users
+# Asynchronous function to fetch all users
 async def async_fetch_users(db_name):
     async with aiosqlite.connect(db_name) as db:
         async with db.execute("SELECT * FROM users") as cursor:
@@ -20,7 +20,7 @@ async def async_fetch_users(db_name):
                 print(row)
             return result
 
-# Function to fetch users older than 40
+# Asynchronous function to fetch users older than 40
 async def async_fetch_older_users(db_name):
     async with aiosqlite.connect(db_name) as db:
         async with db.execute("SELECT * FROM users WHERE age > 40") as cursor:
@@ -34,6 +34,7 @@ async def async_fetch_older_users(db_name):
 async def fetch_concurrently():
     db_name = "test_async.db"
     await initialize_db(db_name)
+    # Use asyncio.gather to run both functions concurrently
     await asyncio.gather(
         async_fetch_users(db_name),
         async_fetch_older_users(db_name)

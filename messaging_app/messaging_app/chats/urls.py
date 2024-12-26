@@ -9,4 +9,5 @@ router.register(r"messages", MessageViewSet)
 
 urlpatterns = [
     path("api/", include(router.urls)),
+    path("api-auth/", include("rest_framework.urls")),
 ]

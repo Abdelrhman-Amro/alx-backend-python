@@ -74,6 +74,7 @@ WSGI_APPLICATION = "messaging_app.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+AUTH_USER_MODEL = "chats.User"
 
 DATABASES = {
     "default": {

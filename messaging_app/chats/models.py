@@ -19,7 +19,7 @@ class User(AbstractUser):
     # index user
     class Meta:
         indexes = [
-            models.Index(fields=["user"], name="user_idx"),
+            models.Index(fields=["username"], name="username_idx"),
         ]
 
 

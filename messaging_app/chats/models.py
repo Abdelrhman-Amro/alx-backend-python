@@ -17,7 +17,7 @@ class User(AbstractUser):
     role = models.IntegerField(choices=Roles.choices)
 
 
-# conversation Model
+# conversation Models
 class conversation(models.Model):
     conversation_id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False, unique=True, db_index=True

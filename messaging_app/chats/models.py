@@ -16,8 +16,14 @@ class user(AbstractUser):
     phone_number = models.CharField(max_length=50, null=True)
     role = models.IntegerField(choices=Roles.choices)
 
+    # index user
+    class Meta:
+        indexes = [
+            models.Index(fields=["username"], name="username_idx"),
+        ]
 
-# conversation Models
+
+# conversation Model
 class conversation(models.Model):
     conversation_id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False, unique=True, db_index=True

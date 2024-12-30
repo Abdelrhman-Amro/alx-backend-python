@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-)g6#ldn3y$(wu%#40alev0ia-d3%g=17oinus_7@+kkakz1hft"
+SECRET_KEY = "django-insecure-pefa@4q!9jjov#$x9@$sodw!(w5aox41hk5a-dv(w*)4gdq$3m"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -40,17 +40,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "chats",
 ]
-
-
-REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",  # Require authentication by default
-    ],
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",  # Use session-based authentication
-        "rest_framework.authentication.TokenAuthentication",  # Optional: token-based authentication
-    ],
-}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -85,7 +74,6 @@ WSGI_APPLICATION = "messaging_app.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-AUTH_USER_MODEL = "chats.User"
 
 DATABASES = {
     "default": {

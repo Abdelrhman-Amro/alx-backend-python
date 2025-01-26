@@ -1,6 +1,8 @@
 FROM python:3.10
 
+# -p
 # Set the working directory
+RUN mkdir /app
 WORKDIR /app
 
 # Copy the requirements file

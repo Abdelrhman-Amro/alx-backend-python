@@ -1,12 +1,19 @@
 from django.urls import include, path
-from rest_framework import routers
+
+# pip install drf-nested-routers
+from rest_framework_nested.routers import DefaultRouter, NestedDefaultRouter
 
 from . import views
 
-router = routers.DefaultRouter()
+router = DefaultRouter()
 router.register(r"conversations", views.ConversationViewSet)
-router.register(r"messages", views.MessageViewSet)
+
+messages_router = NestedDefaultRouter(router, r"conversations", lookup="conversation")
+messages_router.register(r"messages", views.MessageViewSet, basename="message")
+# 'basename' is optional. Needed only if the same viewset is registered more than once
+
 
 urlpatterns = [
-    path("", include(router.urls)),
+    path(r"", include(router.urls)),
+    path(r"", include(messages_router.urls)),
 ]

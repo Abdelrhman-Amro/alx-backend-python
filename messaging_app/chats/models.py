@@ -1,5 +1,6 @@
 import uuid
 
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -40,3 +41,55 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+
+
+### Message Model ###
+# message_id (Primary Key, UUID, Indexed)
+# sender_id (Foreign Key, references User(user_id))
+# message_body (TEXT, NOT NULL)
+# sent_at (TIMESTAMP, DEFAULT CURRENT_TIMESTAMP)
+class Message(models.Model):
+    message_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    sender_id = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="sender"
+    )
+    message_body = models.TextField()
+    sent_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Message"
+        verbose_name_plural = "Messages"
+        indexes = [
+            models.Index(fields=["message_id"], name="message_id_idx"),
+            models.Index(fields=["sender_id"], name="sender_id_idx"),
+        ]
+
+    def __str__(self):
+        return f"Sender-ID: {self.sender_id} sent Message-ID: {self.message_id} at {self.sent_at}"
+
+
+### Conversation Model ###
+# conversation_id (Primary Key, UUID, Indexed)
+# participants_id (Foreign Key, references User(user_id)
+# created_at (TIMESTAMP, DEFAULT CURRENT_TIMESTAMP)
+class Conversation(models.Model):
+    conversation_id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False
+    )
+    participants_id = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, related_name="participants"
+    )
+    messages = models.ForeignKey(
+        Message, on_delete=models.CASCADE, related_name="messages"
+    )  # relate to all messages in the conversation
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Conversation"
+        verbose_name_plural = "Conversations"
+        indexes = [
+            models.Index(fields=["conversation_id"], name="conversation_id_idx"),
+        ]
+
+    def __str__(self):
+        return f"Conversation-ID: {self.conversation_id} created at {self.created_at}"

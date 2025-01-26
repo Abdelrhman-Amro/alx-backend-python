@@ -19,10 +19,10 @@ class UserSerializer(serializers.ModelSerializer):
 class ConversationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Conversation
-        fields = ["conversation_id", "participants_id", "created_at"]
+        fields = "__all__"
 
 
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
-        fields = ["message_id", "sender_id", "conversation_id", "sent_at", "content"]
+        fields = "__all__"

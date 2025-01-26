@@ -1,4 +1,4 @@
-from rest_framework import status, viewsets
+from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -13,11 +13,13 @@ from .serializers import ConversationSerializer, MessageSerializer, UserSerializ
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
+    filters = [filters.SearchFilter, filters.OrderingFilter]
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
+    filters = [filters.SearchFilter, filters.OrderingFilter]
 
     # Get all messages for a conversation
     @action(methods=["GET"], detail=True)

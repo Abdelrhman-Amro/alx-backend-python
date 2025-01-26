@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Apply the updated deployment file
+kubectl apply -f blue_deployment.yaml
+
+# Monitor the update progress
+kubectl rollout status deployment/django-app
+
+# Test for downtime by continuously sending requests
+while true; do
+  curl -s -o /dev/null -w "%{http_code}" http://<your-django-app-url>
+  sleep 1
+done
+
+# Verify the Rolling Update is Complete by checking the current pods
+kubectl get pods

@@ -4,18 +4,6 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-### User Model ####
-# user_id (Primary Key, UUID, Indexed)
-# first_name (VARCHAR, NOT NULL)
-# last_name (VARCHAR, NOT NULL)
-# email (VARCHAR, UNIQUE, NOT NULL)
-# password_hash (VARCHAR, NOT NULL)
-# phone_number (VARCHAR, NULL)
-# role (ENUM: 'guest', 'host', 'admin', NOT NULL)
-# created_at (TIMESTAMP, DEFAULT CURRENT_TIMESTAMP)
-
-# Create the user Model an extension of the Abstract user for values not defined in the built-in Django User model
-
 
 class User(AbstractUser):
     USER_ROLES = [("guest", "Guest"), ("host", "Host"), ("admin", "Admin")]
@@ -26,6 +14,7 @@ class User(AbstractUser):
     role = models.CharField(
         max_length=10,
         choices=USER_ROLES,
+        default="guest",
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -38,13 +27,9 @@ class User(AbstractUser):
         ]
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.username}"
 
 
-### Conversation Model ###
-# conversation_id (Primary Key, UUID, Indexed)
-# participants_id (Foreign Key, references User(user_id)
-# created_at (TIMESTAMP, DEFAULT CURRENT_TIMESTAMP)
 class Conversation(models.Model):
     conversation_id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False
@@ -65,21 +50,14 @@ class Conversation(models.Model):
         return f"Conversation-ID: {self.conversation_id} created at {self.created_at}"
 
 
-### Message Model ###
-# message_id (Primary Key, UUID, Indexed)
-# sender_id (Foreign Key, references User(user_id))
-# message_body (TEXT, NOT NULL)
-# sent_at (TIMESTAMP, DEFAULT CURRENT_TIMESTAMP)
 class Message(models.Model):
     message_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    sender_id = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="sender"
-    )
+    sender_id = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     conversation = models.ForeignKey(
         "Conversation",
         on_delete=models.CASCADE,
         related_name="conversation_messages",
-    )  # blank by default is
+    )
     message_body = models.TextField()
     sent_at = models.DateTimeField(auto_now_add=True)
 

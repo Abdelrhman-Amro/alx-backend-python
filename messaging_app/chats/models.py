@@ -5,7 +5,12 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
+# User
 class User(AbstractUser):
+    """
+    A user of the application.
+    """
+
     USER_ROLES = [("guest", "Guest"), ("host", "Host"), ("admin", "Admin")]
 
     user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -32,14 +37,24 @@ class User(AbstractUser):
         return f"{self.username}"
 
 
+# Conversation
 class Conversation(models.Model):
+    """
+    A conversation between two or more users.
+    """
+
+    # Fields
     conversation_id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False
     )
-    participants_id = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name="participants"
-    )
     created_at = models.DateTimeField(auto_now_add=True)
+
+    # Relationships
+    conversation_owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="owned_conversations",
+    )
 
     class Meta:
         verbose_name = "Conversation"
@@ -49,27 +64,35 @@ class Conversation(models.Model):
         ]
 
     def __str__(self):
-        return f"Conversation-ID: {self.conversation_id} created at {self.created_at}"
+        return f"{self.conversation_owner} {self.conversation_id}"
 
 
+# Message
 class Message(models.Model):
+    """
+    A message sent by a user in a conversation.
+    """
+
+    # Fields
     message_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    sender_id = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    message_body = models.TextField()
+    sent_at = models.DateTimeField(auto_now_add=True)
+
+    # Relationships
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     conversation = models.ForeignKey(
         "Conversation",
         on_delete=models.CASCADE,
-        related_name="conversation_messages",
+        related_name="messages",
     )
-    message_body = models.TextField()
-    sent_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = "Message"
         verbose_name_plural = "Messages"
         indexes = [
             models.Index(fields=["message_id"], name="message_id_idx"),
-            models.Index(fields=["sender_id"], name="sender_id_idx"),
+            models.Index(fields=["sender"], name="sender_idx"),
         ]
 
     def __str__(self):
-        return f"Sender-ID: {self.sender_id} sent Message-ID: {self.message_id} at {self.sent_at}"
+        return f"{self.sender} SENT_TO {self.conversation}"

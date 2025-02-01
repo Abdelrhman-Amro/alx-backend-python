@@ -5,6 +5,7 @@ from .models import Conversation, Message, User
 
 class UserSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
+    phone_number = serializers.CharField()
 
     class Meta:
         model = User
@@ -20,8 +21,13 @@ class UserSerializer(serializers.ModelSerializer):
             "created_at",
         ]
 
-        def get_full_name(self, obj):
-            return f"{obj.first_name} {obj.last_name}"
+    def get_full_name(self, obj):
+        return f"{obj.first_name} {obj.last_name}"
+
+    def validate_phone_number(self, value):
+        if len(value) != 10:
+            raise serializers.ValidationError("Phone number must be 10 digits")
+        return value
 
 
 class ConversationSerializer(serializers.ModelSerializer):

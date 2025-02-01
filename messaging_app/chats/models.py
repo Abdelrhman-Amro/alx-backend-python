@@ -55,6 +55,10 @@ class Conversation(models.Model):
         on_delete=models.CASCADE,
         related_name="owned_conversations",
     )
+    participants = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name="conversations",
+    )
 
     class Meta:
         verbose_name = "Conversation"

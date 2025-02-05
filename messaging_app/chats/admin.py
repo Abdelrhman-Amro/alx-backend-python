@@ -5,21 +5,51 @@ from .models import Conversation, Message, User
 
 
 class UserAdmin(UserAdmin):
+    readonly_fields = ("created_at",)
     fieldsets = (
-        *UserAdmin.fieldsets,  # original form fieldsets, expanded
+        *UserAdmin.fieldsets,
         (
-            "Custom Field Heading",  # group heading of your choice; set to None for a blank space instead of a header
+            "Custom Field Heading",
             {
-                "fields": (
-                    "phone_number",
-                    "role",
-                ),
+                "fields": ("phone_number", "role", "created_at", "password_hash"),
             },
         ),
     )
 
 
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ("message_body", "sender", "conversation", "sent_at")
+    search_fields = ("message_body", "sender__username")
+    list_filter = ("sender", "conversation")
+    readonly_fields = ("sent_at",)
+    fieldsets = (
+        (
+            "Basic Information",
+            {
+                "fields": ("sender", "message_body", "conversation"),
+            },
+        ),
+        ("Timestamps", {"fields": ("sent_at",)}),
+    )
+
+
+class ConversationAdmin(admin.ModelAdmin):
+    list_display = ("conversation_owner", "created_at")
+    search_fields = ("conversation_owner__username",)
+    list_filter = ("conversation_owner",)
+    readonly_fields = ("created_at",)
+    fieldsets = (
+        (
+            "Basic Information",
+            {
+                "fields": ("conversation_owner", "participants"),
+            },
+        ),
+        ("Timestamps", {"fields": ("created_at",)}),
+    )
+
+
 # Register your models here.
 admin.site.register(User, UserAdmin)
-admin.site.register(Message)
-admin.site.register(Conversation)
+admin.site.register(Message, MessageAdmin)
+admin.site.register(Conversation, ConversationAdmin)

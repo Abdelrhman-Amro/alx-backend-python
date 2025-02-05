@@ -1,6 +1,7 @@
 import uuid
 
 from django.conf import settings
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -8,22 +9,24 @@ from django.db import models
 # User
 class User(AbstractUser):
     """
-    A user of the application.
+    A user of the chat service.
     """
 
     USER_ROLES = [("guest", "Guest"), ("host", "Host"), ("admin", "Admin")]
 
+    # Fields
     user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     first_name = models.CharField(max_length=150, blank=True)
     last_name = models.CharField(max_length=150, blank=True)
-    password_hash = models.CharField(max_length=255, null=False)
-    phone_number = models.CharField(max_length=20, null=True)
+    password_hash = models.CharField(max_length=128, blank=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
     role = models.CharField(
         max_length=10,
         choices=USER_ROLES,
         default="guest",
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    date_joined = None  # Removing defdate_joined field
 
     class Meta:
         verbose_name = "User"
@@ -32,6 +35,7 @@ class User(AbstractUser):
             models.Index(fields=["user_id"], name="user_id_idx"),
             models.Index(fields=["email"], name="email_idx"),
         ]
+        swappable = "AUTH_USER_MODEL"
 
     def __str__(self):
         return f"{self.username}"
@@ -68,7 +72,7 @@ class Conversation(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.conversation_owner} {self.conversation_id}"
+        return f"{self.conversation_owner} {self.conversation_id} CONVERSATION"
 
 
 # Message
@@ -99,4 +103,4 @@ class Message(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.sender} SENT_TO {self.conversation}"
+        return f"{self.sender} SENT_TO {self.conversation} "

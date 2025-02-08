@@ -1,7 +1,6 @@
 from django.urls import include, path
-
-# pip install drf-nested-routers
 from rest_framework_nested import routers
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from . import views
 
@@ -18,4 +17,6 @@ messages_router.register(r"messages", views.MessageViewSet, basename="message")
 urlpatterns = [
     path(r"", include(router.urls)),
     path(r"", include(messages_router.urls)),
+    path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]

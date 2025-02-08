@@ -10,12 +10,13 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
+            "user_id",
             "user_name",
+            "full_name",
             "first_name",
             "last_name",
-            "full_name",
             "email",
-            "password_hash",
+            "password",
             "phone_number",
             "role",
             "created_at",

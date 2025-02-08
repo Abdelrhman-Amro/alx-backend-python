@@ -10,6 +10,7 @@ from .serializers import ConversationSerializer, MessageSerializer, UserSerializ
 #     serializer_class = UserSerializer
 
 
+# CRUD
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer

@@ -5,13 +5,19 @@ from .models import Conversation, Message, User
 
 
 class UserAdmin(UserAdmin):
-    readonly_fields = ("created_at",)
+    readonly_fields = ("created_at", "user_id")
     fieldsets = (
         *UserAdmin.fieldsets,
         (
             "Custom Field Heading",
             {
-                "fields": ("phone_number", "role", "created_at", "password_hash"),
+                "fields": (
+                    "user_id",
+                    "phone_number",
+                    "role",
+                    "created_at",
+                    "password_hash",
+                ),
             },
         ),
     )

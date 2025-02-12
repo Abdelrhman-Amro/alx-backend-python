@@ -1,6 +1,10 @@
 from django.urls import include, path
 from rest_framework_nested import routers
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import (
+    TokenBlacklistView,
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 from . import views
 
@@ -19,4 +23,5 @@ urlpatterns = [
     path(r"", include(messages_router.urls)),
     path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("token/blacklist/", TokenBlacklistView.as_view(), name="token_blacklist"),
 ]

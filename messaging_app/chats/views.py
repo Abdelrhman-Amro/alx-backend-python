@@ -14,13 +14,11 @@ from .serializers import ConversationSerializer, MessageSerializer
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
-    filters = [filters.SearchFilter, filters.OrderingFilter]
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
-    filters = [filters.SearchFilter, filters.OrderingFilter]
 
     # Get all messages for a conversation
     @action(methods=["GET"], detail=True)

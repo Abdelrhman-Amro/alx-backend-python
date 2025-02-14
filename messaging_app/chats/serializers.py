@@ -54,9 +54,20 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ConversationSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Conversation
-        fields = "__all__"
+        fields = ["conversation_id", "conversation_owner", "created_at", "participants"]
+        read_only_fields = ("conversation_id", "created_at", "conversation_owner")
+
+    def validate_participants(self, value):
+        """
+        ✅Ensure that there are at least 2 participants in the conversation.
+        🧠Remember that the conversation owner is automatically added as a participant.
+        """
+        if len(value) < 2:
+            raise serializers.ValidationError("You must add at least 1 participant.")
+        return value
 
 
 class MessageSerializer(serializers.ModelSerializer):

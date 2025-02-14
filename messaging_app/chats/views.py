@@ -1,13 +1,16 @@
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from messaging_app.settings import AUTH_USER_MODEL
-
-from .models import Conversation, Message
+from .models import Conversation, Message, User
 from .serializers import ConversationSerializer, MessageSerializer, UserSerializer
+
+# Get the user model
+User = get_user_model()
 
 
 class UserRegisterView(CreateAPIView):
@@ -26,19 +29,51 @@ class UserRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
+    permission_classes = [IsAuthenticated]
 
-    #
     def get_queryset(self):
-        return Conversation.objects.filter(participants=self.request.user)
+        """
+        Return only the conversations where the authenticated user is a participant.
+        """
+        user = self.request.user
+        return Conversation.objects.filter(participants=user)
 
-    # Get all messages for a conversation
-    @action(methods=["GET"], detail=True)
-    def conversation_messages(self, request, pk=None):
-        conversation = Conversation.objects.get(pk=pk)
-        messages = Message.objects.filter(conversation=conversation)
-        serializer = MessageSerializer(messages, many=True)
-        json = serializer.data
-        return Response(json, status=status.HTTP_200_OK)
+    def get_object(self):
+        user = self.request.user
+        conversation_id = self.kwargs["pk"]
+        return Conversation.objects.filter(
+            conversation_id=conversation_id, conversation_owner=user
+        ).first()
+
+    def create(self, request, *args, **kwargs):
+        """
+        Create a new conversation.
+            - Add the conversation owner to the participants.
+            - Set the conversation owner to the current user. in the perform_create method
+        """
+        serializer = self.get_serializer(data=request.data)
+        conversation_owner = self.request.user
+        participants = serializer.initial_data.get("participants", [])
+
+        # add the conversation owner to the participants
+        if conversation_owner not in participants:
+            serializer.initial_data["participants"].append(conversation_owner.user_id)
+
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
+
+    # create a new conversation
+    def perform_create(self, serializer):
+        """
+        Set the conversation owner to the current user.
+        """
+        conversation_owner = self.request.user
+        serializer.save(conversation_owner=conversation_owner)
 
 
 class MessageViewSet(viewsets.ModelViewSet):

@@ -16,10 +16,11 @@ class User(AbstractUser):
 
     # Fields
     user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=150, blank=True)
     last_name = models.CharField(max_length=150, blank=True)
     password_hash = models.CharField(max_length=128, blank=True)
-    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True)
     role = models.CharField(
         max_length=10,
         choices=USER_ROLES,
@@ -27,6 +28,9 @@ class User(AbstractUser):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     date_joined = None  # Removing defdate_joined field
+
+    USERNAME_FIELD = "email"  # Authentication by email
+    REQUIRED_FIELDS = ["username"]  # Required fields for creating a user
 
     class Meta:
         verbose_name = "User"

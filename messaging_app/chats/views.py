@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
@@ -79,3 +80,38 @@ class ConversationViewSet(viewsets.ModelViewSet):
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        """
+        Return only the message that belongs to the current user.
+        """
+        user = self.request.user
+        message_id = self.kwargs["pk"]
+        msg = get_object_or_404(Message, message_id=message_id, sender=user)
+        return msg
+
+    def get_queryset(self):
+        """
+        Return only the messages that belong to the current user conversation.
+        """
+        user = self.request.user
+        conversation_pk = self.kwargs.get(
+            "conversation_pk"
+        )  # get conversation id from nested url
+        conversation = get_object_or_404(Conversation, conversation_id=conversation_pk)
+        return Message.objects.filter(sender=user, conversation=conversation)
+
+    def perform_create(self, serializer):
+        """
+        Create a new message.
+            - Set the sender_id to the current user.
+            - Set the conversation_id to the conversation specified in the URL.
+        """
+        sender = self.request.user
+        conversation_pk = self.kwargs.get(
+            "conversation_pk"
+        )  # get conversation id from nested url
+        conversation = get_object_or_404(Conversation, conversation_id=conversation_pk)
+
+        serializer.save(sender=sender, conversation=conversation)

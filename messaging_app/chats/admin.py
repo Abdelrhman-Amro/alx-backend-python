@@ -27,12 +27,12 @@ class MessageAdmin(admin.ModelAdmin):
     list_display = ("message_body", "sender", "conversation", "sent_at")
     search_fields = ("message_body", "sender__username")
     list_filter = ("sender", "conversation")
-    readonly_fields = ("sent_at",)
+    readonly_fields = ("sent_at", "message_id")
     fieldsets = (
         (
             "Basic Information",
             {
-                "fields": ("sender", "message_body", "conversation"),
+                "fields": ("message_id", "sender", "message_body", "conversation"),
             },
         ),
         ("Timestamps", {"fields": ("sent_at",)}),

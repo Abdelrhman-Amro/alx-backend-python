@@ -73,4 +73,5 @@ class ConversationSerializer(serializers.ModelSerializer):
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
-        fields = "__all__"
+        fields = ["message_id", "message_body", "sent_at", "sender", "conversation"]
+        read_only_fields = ("message_id", "sent_at", "sender", "conversation")

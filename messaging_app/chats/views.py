@@ -8,6 +8,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from .models import Conversation, Message, User
+from .permissions import IsParticipantOfConversation
 from .serializers import ConversationSerializer, MessageSerializer, UserSerializer
 
 # Get the user model
@@ -40,11 +41,17 @@ class ConversationViewSet(viewsets.ModelViewSet):
         return Conversation.objects.filter(participants=user)
 
     def get_object(self):
+        """
+        Return only the conversation that belongs to the current user.
+        """
         user = self.request.user
         conversation_id = self.kwargs["pk"]
-        return Conversation.objects.filter(
-            conversation_id=conversation_id, conversation_owner=user
-        ).first()
+        obj = get_object_or_404(
+            self.get_queryset(),
+            conversation_id=conversation_id,
+            conversation_owner=user,
+        )
+        return obj
 
     def create(self, request, *args, **kwargs):
         """
@@ -80,7 +87,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsParticipantOfConversation]
 
     def get_object(self):
         """
@@ -88,7 +95,7 @@ class MessageViewSet(viewsets.ModelViewSet):
         """
         user = self.request.user
         message_id = self.kwargs["pk"]
-        msg = get_object_or_404(Message, message_id=message_id, sender=user)
+        msg = get_object_or_404(self.get_queryset(), message_id=message_id, sender=user)
         return msg
 
     def get_queryset(self):

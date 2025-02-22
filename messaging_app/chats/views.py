@@ -8,6 +8,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from .models import Conversation, Message, User
+from .pagination import MessagePagination
 from .permissions import IsParticipantOfConversation
 from .serializers import ConversationSerializer, MessageSerializer, UserSerializer
 
@@ -88,6 +89,7 @@ class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated, IsParticipantOfConversation]
+    pagination_class = MessagePagination
 
     def get_object(self):
         """

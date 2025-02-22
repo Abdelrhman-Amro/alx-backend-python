@@ -1,3 +1,4 @@
 {
-    "conventionalCommits.scopes": ["Users", "chats"]
+    "conventionalCommits.scopes": ["Users", "chats"],
+    "cSpell.words": ["Signup"]
 }

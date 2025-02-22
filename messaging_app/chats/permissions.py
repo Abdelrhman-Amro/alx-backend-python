@@ -13,5 +13,4 @@ class IsParticipantOfConversation(BasePermission):
         conversation = Conversation.objects.get(conversation_id=conversation_id)
         user = request.user
         participants = conversation.participants.all()
-
         return user in participants

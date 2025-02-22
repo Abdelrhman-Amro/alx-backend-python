@@ -1,12 +1,14 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
+from .filters import MessageFilter
 from .models import Conversation, Message, User
 from .pagination import MessagePagination
 from .permissions import IsParticipantOfConversation
@@ -85,11 +87,15 @@ class ConversationViewSet(viewsets.ModelViewSet):
         serializer.save(conversation_owner=conversation_owner)
 
 
+# todo: filter by user and timerange
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated, IsParticipantOfConversation]
     pagination_class = MessagePagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["sender__username"]
+    filterset_class = MessageFilter
 
     def get_object(self):
         """
@@ -109,7 +115,7 @@ class MessageViewSet(viewsets.ModelViewSet):
             "conversation_pk"
         )  # get conversation id from nested url
         conversation = get_object_or_404(Conversation, conversation_id=conversation_pk)
-        return Message.objects.filter(sender=user, conversation=conversation)
+        return Message.objects.filter(conversation=conversation)
 
     def perform_create(self, serializer):
         """

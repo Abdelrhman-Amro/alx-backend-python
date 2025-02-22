@@ -13,4 +13,4 @@ class MessageFilter(django_filters.FilterSet):
 
     class Meta:
         model = Message
-        fields = ["start_sent_date", "end_sent_date"]
+        fields = ["sender__username", "start_sent_date", "end_sent_date"]

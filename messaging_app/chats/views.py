@@ -87,14 +87,12 @@ class ConversationViewSet(viewsets.ModelViewSet):
         serializer.save(conversation_owner=conversation_owner)
 
 
-# todo: filter by user and timerange
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated, IsParticipantOfConversation]
     pagination_class = MessagePagination
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["sender__username"]
     filterset_class = MessageFilter
 
     def get_object(self):
